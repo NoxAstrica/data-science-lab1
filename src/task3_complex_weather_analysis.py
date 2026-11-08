@@ -8,45 +8,54 @@ except ImportError:
 
 def analyze_daily_weather(day: Dict[str, Any], temp_threshold: float = 30, 
                           wind_threshold: float = 15, humidity_threshold: float = 70) -> Dict[str, Any]:
-    """
-    Analyze weather data for a single day.
-
-    Args:
-        day (dict): The weather data for the day.
-        temp_threshold (float): The temperature threshold to determine a hot day.
-        wind_threshold (float): The wind speed threshold to determine a windy day.
-        humidity_threshold (float): The humidity threshold to determine uncomfortable weather.
-
-    Returns:
-        dict: A dictionary with analysis results for the day.
-    """
-    pass
-
+    return {
+        "date": day["date"],
+        "weather_description": day["weather_description"],
+        "max_temperature": day["max_temperature"],
+        "min_temperature": day["min_temperature"],
+        "temperature_swing": day["max_temperature"] - day["min_temperature"],
+        "wind_speed": day["wind_speed"],
+        "humidity": day["humidity"],
+        "precipitation": day["precipitation"],
+        "is_hot_day": day["max_temperature"] > temp_threshold,
+        "is_windy_day": day["wind_speed"] > wind_threshold,
+        "is_uncomfortable_day": day["humidity"] > humidity_threshold,
+        "is_rainy_day": day["precipitation"] > 0,
+    }
 
 def generate_daily_report(analysis: Dict[str, Any]) -> str:
-    """
-    Generate a detailed report based on the analysis results for a single day.
-
-    Args:
-        analysis (dict): The analysis results for the day.
-
-    Returns:
-        str: A detailed report as a string.
-    """
-    pass
+    lines = [
+        f"Date: {analysis['date']}",
+        f"Weather: {analysis['weather_description']}",
+        f"Temperature: Max {analysis['max_temperature']:.1f}°C, "
+        f"Min {analysis['min_temperature']:.1f}°C "
+        f"(Swing: {analysis['temperature_swing']:.1f}°C)",
+    ]
+    if analysis["is_hot_day"]:
+        lines.append("It was a hot day.")
+    if analysis["is_windy_day"]:
+        lines.append("It was a windy day.")
+    if analysis["is_uncomfortable_day"]:
+        lines.append("The humidity made the day uncomfortable.")
+    if analysis["is_rainy_day"]:
+        lines.append("It was a rainy day.")
+    else:
+        lines.append("There was no precipitation.")
+    return "\n".join(lines) + "\n"
 
 
 def summarize_weather_analysis(analyses: List[Dict[str, Any]]) -> str:
-    """
-    Summarize the weather analysis over multiple days.
-
-    Args:
-        analyses (list of dict): A list of daily analysis results.
-
-    Returns:
-        str: A summary report as a string.
-    """
-    pass
+    hottest = max(analyses, key=lambda a: a["max_temperature"])
+    windiest = max(analyses, key=lambda a: a["wind_speed"])
+    humid = max(analyses, key=lambda a: a["humidity"])
+    rainiest = max(analyses, key=lambda a: a["precipitation"])
+    return (
+        "Weather Summary:\n"
+        f"Hottest day: {hottest['date']} with a maximum temperature of {hottest['max_temperature']:.1f}°C\n"
+        f"Windiest day: {windiest['date']} with wind speeds of {windiest['wind_speed']:.1f} km/h\n"
+        f"Most humid day: {humid['date']} with a humidity level of {humid['humidity']}%\n"
+        f"Rainiest day: {rainiest['date']} with {rainiest['precipitation']:.1f} mm of precipitation"
+    )
 
 
 if __name__ == "__main__":

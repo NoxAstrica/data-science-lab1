@@ -8,21 +8,16 @@ except ImportError:
 
 
 def fetch_weather_data() -> Dict[str, any]:
-    """
-    Fetch the maximum temperature forecast for Tokyo using the Open-Meteo API.
-
-    Returns:
-        dict: A dictionary containing the date and the maximum temperature.
-
-    Raises:
-        requests.HTTPError: If the HTTP request returned an unsuccessful status code.
-        requests.RequestException: If there was a network error.
-        KeyError: If the expected data is not in the API response.
-    """
     url = ("https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917"
            "&daily=temperature_2m_max&timezone=Asia/Tokyo")
+
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()
+    data = response.json()
     
-    pass
+    date = data["daily"]["time"][0]
+    max_temp = data["daily"]["temperature_2m_max"][0]
+    return {"date": date, "max_temperature": max_temp}
 
 
 if __name__ == "__main__":

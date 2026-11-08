@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from typing import Dict
+import re
 
 try:
     from .utils import save_to_json
@@ -9,46 +10,23 @@ except ImportError:
 
 
 def fetch_wikipedia_page(url: str) -> str:
-    """
-    Fetch the HTML content of the given Wikipedia page.
-
-    Args:
-        url (str): The URL of the Wikipedia page to fetch.
-
-    Returns:
-        str: The HTML content of the page as a string.
-
-    Raises:
-        requests.HTTPError: If the HTTP request returned an unsuccessful status code.
-        requests.RequestException: If there was a network error.
-    """
-    pass
+    headers = {"User-Agent": "DS-Lab-1 student"}
+    response = requests.get(url, headers=headers, timeout=10)
+    response.raise_for_status()
+    return response.text
 
 
 def extract_title(soup: BeautifulSoup) -> str:
-    """
-    Extract the title of the Wikipedia page.
-
-    Args:
-        soup (BeautifulSoup): A BeautifulSoup object representing the parsed HTML.
-
-    Returns:
-        str: The title of the page.
-    """
-    pass
+    return soup.find("h1").get_text(strip=True)
 
 
 def extract_first_sentence(soup: BeautifulSoup) -> str:
-    """
-    Extract the first sentence of the first paragraph on the Wikipedia page.
-
-    Args:
-        soup (BeautifulSoup): A BeautifulSoup object representing the parsed HTML.
-
-    Returns:
-        str: The first sentence of the first paragraph.
-    """
-    pass
+    for p in soup.find_all("p"):
+        text = p.get_text().strip()
+        if text:
+            text = re.sub(r"\[\d+\]", "", text)
+            return text.split(". ")[0] + "."
+    return ""
 
 
 if __name__ == "__main__":
